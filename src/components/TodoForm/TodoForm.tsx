@@ -28,10 +28,12 @@ const TodoForm: React.FC = () => {
         if (addMode) {
             todoService.addTodo({
                 text: text,
-                isChecked: false
+                isChecked: false,
+                timestamp: new Date()
+            }).then( _ => {
+                clearInput();
+                setAddMode(false);
             });
-            clearInput();
-            setAddMode(false);
         } else {
             setAddMode(true);
         }

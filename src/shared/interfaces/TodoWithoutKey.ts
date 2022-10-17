@@ -1,6 +1,7 @@
 interface TodoWithoutKey {
     text: string,
-    isChecked: boolean
+    isChecked: boolean,
+    timestamp: Date
 }
 
 export default TodoWithoutKey;

@@ -1,48 +1,64 @@
+import {firebaseDatabase} from "../../firebase/firebase";
+import {collection, doc, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot} from "firebase/firestore"
 import {Todo} from "../interfaces/Todo";
-import {HTTPMethod} from "workbox-routing/utils/constants";
-import {firebaseApp} from "../../firebase/firebase";
 import TodoWithoutKey from "../interfaces/TodoWithoutKey";
+import React from "react";
 
-const headers = {
-    "Accept": "application/json",
-    "Content-type": "application/json"
-};
 
 class TodoService {
-    private baseUrl: string;
+
+    private readonly todoCollectionRef;
 
     constructor() {
-        this.baseUrl = "https://todo-app-7eb4b-default-rtdb.firebaseio.com";
+        this.todoCollectionRef = collection(firebaseDatabase, 'todos');
     }
 
-    public request(url: string, method: HTTPMethod = "POST", data?: Todo) {
-        url = this.fullUrl(url);
-        let options: RequestInit = {
-            headers,
-            method,
-        }
-        if(data) {
-            options.body = JSON.stringify({...data});
-        }
-        return fetch(url, options);
+    public async getAllTodos() {
+        return getDocs(this.todoCollectionRef).then( response => {
+            return response.docs.map<Todo>(doc => ({
+                key: doc.id,
+                text: doc.get('text'),
+                isChecked: doc.get('isChecked'),
+                timestamp: new Date()
+            }));
+        })
     }
 
-
-    public addTodo(todo: Todo | TodoWithoutKey) {
-        return firebaseApp.database().ref("/todos").push(todo);
+    public async addTodo(todo: TodoWithoutKey) {
+        return addDoc(this.todoCollectionRef, todo).then( response => {
+            const newTodo: Todo = {
+                key: response.id,
+                text: todo.text,
+                isChecked: todo.isChecked,
+                timestamp: todo.timestamp
+            };
+            return newTodo;
+        });
     }
 
     public deleteTodo(todo: Todo) {
-        return firebaseApp.database().ref("/todos").child(todo.key).remove();
+        const docRef = doc(this.todoCollectionRef, '/', todo.key);
+        return deleteDoc(docRef);
     }
 
-    public changeCheckState(todo: Todo) {
-        return firebaseApp.database().ref("/todos").child(todo.key).child("isChecked").set(todo.isChecked);
+    public async changeCheckState(todo: Todo) {
+        todo.isChecked = !todo.isChecked;
+        const docRef = doc(this.todoCollectionRef, '/', todo.key);
+        return updateDoc(docRef, {text: todo.text, isChecked: todo.isChecked, timestamp: todo.timestamp});
     }
 
-    private fullUrl = (url: string) => {
-        return `${this.baseUrl}/${url}`;
+    public realtimeUpdate(setTodos: React.Dispatch<React.SetStateAction<Todo[]>>) {
+        return onSnapshot(this.todoCollectionRef, snapshot => {
+            const updatedTodos = snapshot.docs.map(doc => ({
+                key: doc.id,
+                text: doc.data().text,
+                isChecked: doc.data().isChecked,
+                timestamp: doc.data().timestamp
+            }))
+            setTodos(updatedTodos);
+        })
     }
+
 }
 
 export default TodoService;

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import {IonCheckbox, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel} from "@ionic/react";
 import {Todo} from "../../shared/interfaces/Todo";
 import TodoService from "../../shared/services/TodoService";
@@ -9,37 +9,30 @@ interface TodoItemProps {
     todo: Todo
 }
 
-interface ItemSlidingCustomEvent extends CustomEvent {
-    target: HTMLIonItemSlidingElement;
-}
-
 const TodoItem: React.FC<TodoItemProps> = (props) => {
 
     const todoService = new TodoService();
     const [isChecked, setIsChecked] = useState(props.todo.isChecked);
 
-    const ionDragEventHandler = (event: ItemSlidingCustomEvent) => {
-        const ionItemSlidingElement = event.target;
-        ionItemSlidingElement.getSlidingRatio()
-            .then(ratio => {
-                if (ratio < -3 || ratio > 3) {
-                    ionItemSlidingElement.closeOpened();
-                }
-            })
-    }
+    const ionItemSlidingElement = useRef<HTMLIonItemSlidingElement>(null)
+
 
     const deleteOnIonSwipeEventHandler = () => {
-        todoService.deleteTodo(props.todo);
+        ionItemSlidingElement.current!.closeOpened().then(_ => {
+            todoService.deleteTodo(props.todo).catch(error => console.log(error));
+        });
     }
 
     const checkOnIonSwipeEventHandler = () => {
-        props.todo.isChecked = !props.todo.isChecked;
-        setIsChecked(props.todo.isChecked);
-        todoService.changeCheckState(props.todo);
+        ionItemSlidingElement.current!.closeOpened().then(_ => {
+            todoService.changeCheckState(props.todo).then(_ => {
+                setIsChecked(props.todo.isChecked);
+            });
+        });
     }
 
     return (
-        <IonItemSliding onIonDrag={ionDragEventHandler}>
+        <IonItemSliding ref={ionItemSlidingElement}>
 
             <IonItemOptions onIonSwipe={checkOnIonSwipeEventHandler} onClick={checkOnIonSwipeEventHandler} side="start">
                 <IonItemOption color="success" expandable>Complete</IonItemOption>
