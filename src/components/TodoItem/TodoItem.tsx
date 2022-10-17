@@ -43,7 +43,7 @@ const TodoItem: React.FC<TodoItemProps> = (props) => {
                 <IonLabel>{props.todo.text}</IonLabel>
             </IonItem>
 
-            <IonItemOptions onIonSwipe={deleteOnIonSwipeEventHandler} side="end">
+            <IonItemOptions onIonSwipe={deleteOnIonSwipeEventHandler} onClick={deleteOnIonSwipeEventHandler} side="end">
                 <IonItemOption color="danger" expandable>Delete</IonItemOption>
             </IonItemOptions>
 

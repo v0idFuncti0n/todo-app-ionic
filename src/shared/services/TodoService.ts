@@ -1,5 +1,5 @@
 import {firebaseDatabase} from "../../firebase/firebase";
-import {collection, doc, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot} from "firebase/firestore"
+import {collection, doc, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy} from "firebase/firestore"
 import {Todo} from "../interfaces/Todo";
 import TodoWithoutKey from "../interfaces/TodoWithoutKey";
 import React from "react";
@@ -48,13 +48,14 @@ class TodoService {
     }
 
     public realtimeUpdate(setTodos: React.Dispatch<React.SetStateAction<Todo[]>>) {
-        return onSnapshot(this.todoCollectionRef, snapshot => {
+        const todosInDescendingOrder = query(collection(this.todoCollectionRef, '/'), orderBy('timestamp'));
+        return onSnapshot(todosInDescendingOrder, snapshot => {
             const updatedTodos = snapshot.docs.map(doc => ({
                 key: doc.id,
                 text: doc.data().text,
                 isChecked: doc.data().isChecked,
                 timestamp: doc.data().timestamp
-            }))
+            }));
             setTodos(updatedTodos);
         })
     }
