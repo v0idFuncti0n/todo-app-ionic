@@ -1,5 +1,5 @@
 import React, {createRef, useState} from "react";
-import { IonButton, IonItem, IonInput } from '@ionic/react';
+import {IonButton, IonItem, IonInput} from '@ionic/react';
 import TodoService from "../../shared/services/TodoService";
 
 interface InputChangeEventDetail {
@@ -14,7 +14,6 @@ interface InputCustomEvent extends CustomEvent {
 const TodoForm: React.FC = () => {
 
     const [text, setText] = useState("");
-    const [addMode, setAddMode] = useState(false);
 
     const ionInputRef = createRef<HTMLIonInputElement>();
 
@@ -25,18 +24,13 @@ const TodoForm: React.FC = () => {
     }
 
     const addTodo = () => {
-        if (addMode) {
-            todoService.addTodo({
-                text: text,
-                isChecked: false,
-                timestamp: new Date()
-            }).then( _ => {
-                clearInput();
-                setAddMode(false);
-            });
-        } else {
-            setAddMode(true);
-        }
+        todoService.addTodo({
+            text: text,
+            isChecked: false,
+            timestamp: new Date()
+        }).then( _ => {
+            clearInput();
+        });
     }
 
     const clearInput = () => {
@@ -46,10 +40,11 @@ const TodoForm: React.FC = () => {
 
     return (
         <>
-            <IonItem>
-                <IonInput hidden={!addMode} ref={ionInputRef} onIonChange={inputChangeEventHandler} clearInput={true} placeholder="Add Todo"></IonInput>
+            <IonItem lines="none">
+                <IonInput ref={ionInputRef} onIonChange={inputChangeEventHandler} clearInput={true}
+                          placeholder="Add Todo"></IonInput>
             </IonItem>
-            <IonButton expand="full" onClick={addTodo}>{addMode ? "Save" : "Add"} </IonButton>
+            <IonButton expand="full" onClick={addTodo}>Add</IonButton>
         </>
     );
 }

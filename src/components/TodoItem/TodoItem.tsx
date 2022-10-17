@@ -38,7 +38,7 @@ const TodoItem: React.FC<TodoItemProps> = (props) => {
                 <IonItemOption color="success" expandable>Complete</IonItemOption>
             </IonItemOptions>
 
-            <IonItem lines={"none"}>
+            <IonItem>
                 <IonCheckbox className="disabled" slot="start" color="success" checked={isChecked}></IonCheckbox>
                 <IonLabel>{props.todo.text}</IonLabel>
             </IonItem>
