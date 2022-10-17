@@ -14,7 +14,7 @@ const TodoList: React.FC = () => {
             const unsubscribe = todoService.realtimeUpdate(setTodos);
 
             return () => {
-                unsubscribe()
+                unsubscribe();
             }
         }, [])
 
