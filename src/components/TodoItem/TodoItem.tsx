@@ -41,6 +41,7 @@ const TodoItem: React.FC<TodoItemProps> = (props) => {
             <IonItem>
                 <IonCheckbox className="disabled" slot="start" color="success" checked={isChecked}></IonCheckbox>
                 <IonLabel>{props.todo.text}</IonLabel>
+                <IonLabel >{props.todo.timestamp.toLocaleString()}</IonLabel>
             </IonItem>
 
             <IonItemOptions onIonSwipe={deleteOnIonSwipeEventHandler} onClick={deleteOnIonSwipeEventHandler} side="end">

@@ -4,7 +4,6 @@ import {Todo} from "../interfaces/Todo";
 import TodoWithoutKey from "../interfaces/TodoWithoutKey";
 import React from "react";
 
-
 class TodoService {
 
     private readonly todoCollectionRef;
@@ -54,7 +53,7 @@ class TodoService {
                 key: doc.id,
                 text: doc.data().text,
                 isChecked: doc.data().isChecked,
-                timestamp: doc.data().timestamp
+                timestamp: new Date(doc.data().timestamp.seconds * 1000)
             }));
             setTodos(updatedTodos);
         })
